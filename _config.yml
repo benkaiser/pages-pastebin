@@ -1,0 +1,20 @@
+collections:
+  public:
+    output: true
+    permalink: /public/:path/
+  unlisted:
+    output: true
+    permalink: /unlisted/:path/
+defaults:
+  -
+    scope:
+      path: ""
+      type: "public"
+    values:
+      layout: "snippet"
+  -
+    scope:
+      path: ""
+      type: "unlisted"
+    values:
+      layout: "snippet"

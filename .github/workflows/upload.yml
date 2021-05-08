@@ -1,0 +1,28 @@
+name: 'Upload Image'
+on:
+  repository_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - env:
+        GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
+      run: echo "FILE_NAME=$(echo $GITHUB_CONTEXT | jq '.filename' -r)" >> $GITHUB_ENV
+    - env:
+        GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
+      run: echo "FILE_CONTENTS=$(echo $GITHUB_CONTEXT | jq '.image' -r)" >> $GITHUB_ENV
+    - name: Write File
+      id: write_file
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'images/${{ env.FILE_NAME }}'
+        encodedString: ${{ env.FILE_CONTENTS }}
+    - name: Move File
+      run: mv ${{ steps.write_file.outputs.filePath }} 'images/${{ env.FILE_NAME }}'
+    - name: Committing changes
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: Github Actions
+        author_email: actions@github.com
