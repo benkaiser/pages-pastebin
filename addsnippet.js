@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const { ID, VISIBILITY, MODE, TITLE, CONTENTS } = process.env;
+const ID = unescape(process.env.ID);
+const VISIBILITY = unescape(process.env.VISIBILITY);
+const MODE = unescape(process.env.MODE);
+const TITLE = unescape(process.env.TITLE);
+const CONTENTS = unescape(process.env.CONTENTS);
 
 if (VISIBILITY !== "public" && VISIBILITY !== "unlisted") {
   console.error("Visibility must be public or unlisted");
