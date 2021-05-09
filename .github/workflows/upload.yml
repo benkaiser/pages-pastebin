@@ -19,8 +19,11 @@ jobs:
     - env:
         GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
       run: echo "VISIBILITY=$(echo $GITHUB_CONTEXT | jq '.visibility' -r)" >> $GITHUB_ENV
+    - env:
+        GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
+      run: echo "MODE=$(echo $GITHUB_CONTEXT | jq '.mode' -r)" >> $GITHUB_ENV
     - name: Writing Snippet to File
-      run: ./addsnippet.sh
+      run: node addsnippet.sh
     - name: Committing changes
       uses: EndBug/add-and-commit@v7
       with:
