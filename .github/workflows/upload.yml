@@ -23,7 +23,7 @@ jobs:
         GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
       run: echo "MODE=$(echo $GITHUB_CONTEXT | jq '.mode' -r)" >> $GITHUB_ENV
     - name: Writing Snippet to File
-      run: node addsnippet.sh
+      run: node addsnippet.js
     - name: Committing changes
       uses: EndBug/add-and-commit@v7
       with:
