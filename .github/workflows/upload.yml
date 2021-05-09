@@ -1,4 +1,4 @@
-name: 'Upload Image'
+name: 'Add Snippet'
 on:
   repository_dispatch:
 
