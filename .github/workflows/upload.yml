@@ -9,20 +9,21 @@ jobs:
     - uses: actions/checkout@v2
     - env:
         GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
-      run: echo "FILE_NAME=$(echo $GITHUB_CONTEXT | jq '.filename' -r)" >> $GITHUB_ENV
+      run: echo "TITLE=$(echo $GITHUB_CONTEXT | jq '.title' -r)" >> $GITHUB_ENV
     - env:
         GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
-      run: echo "FILE_CONTENTS=$(echo $GITHUB_CONTEXT | jq '.image' -r)" >> $GITHUB_ENV
-    - name: Write File
-      id: write_file
-      uses: timheuer/base64-to-file@v1
-      with:
-        fileName: 'images/${{ env.FILE_NAME }}'
-        encodedString: ${{ env.FILE_CONTENTS }}
-    - name: Move File
-      run: mv ${{ steps.write_file.outputs.filePath }} 'images/${{ env.FILE_NAME }}'
+      run: echo "CONTENTS=$(echo $GITHUB_CONTEXT | jq '.contents' -r)" >> $GITHUB_ENV
+    - env:
+        GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
+      run: echo "ID=$(echo $GITHUB_CONTEXT | jq '.id' -r)" >> $GITHUB_ENV
+    - env:
+        GITHUB_CONTEXT: ${{ github.event.client_payload.data }}
+      run: echo "VISIBILITY=$(echo $GITHUB_CONTEXT | jq '.visibility' -r)" >> $GITHUB_ENV
+    - name: Writing Snippet to File
+      run: ./addsnippet.sh
     - name: Committing changes
       uses: EndBug/add-and-commit@v7
       with:
         author_name: Github Actions
         author_email: actions@github.com
+        pull_strategy: '--rebase'
