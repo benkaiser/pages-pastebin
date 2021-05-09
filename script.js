@@ -119,7 +119,7 @@ class App extends Component {
         mode: escape(this.modeRef.current.value),
         visibility: escape(visibility),
         title: escape(this.titleRef.current.value),
-        contents: escape(this.editor),
+        contents: escape(this.editor.getValue()),
         id: escape(id)
       })}})
     }).then((response) => {
