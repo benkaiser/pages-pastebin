@@ -24,6 +24,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.modeRef = createRef();
+    this.titleRef = createRef();
+    this.visibilityRef = createRef();
     this.state = {
       status: '',
       mode: 'ace/mode/text',
@@ -71,11 +73,15 @@ class App extends Component {
             })}
             </select>
             <label for="title">Title</label>
-            <input type="text" name="title" />
-
+            <input type="text" name="title" ref=${this.titleRef} />
+            <label for="visibility">Visibility</label>
+            <select name="visibility" ref=${this.visibilityRef} value="public">
+              <option value="public">Public</option>
+              <option value="unlisted">Unlisted</option>
+            </select>
           </fieldset>
         </form>
-        <button class="pure-button pure-button-primary">Save Paste</button>
+        <button class="pure-button pure-button-primary" onClick=${this.onSubmit}>Save Paste</button>
       </Fragment>
     `;
   }
@@ -84,7 +90,7 @@ class App extends Component {
     return html`
       <Fragment>
         <p>${this.state.status}</p>
-        ${ this.state.loading ? html`<div className="spinner primary"></div> ` : ''}
+        ${ this.state.loading ? html`<div key="spinner" class="lds-facebook"><div></div><div></div><div></div></div>` : ''}
       </Fragment>
     `;
   }
@@ -99,48 +105,46 @@ class App extends Component {
     });
   }
 
-  onUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) {
-      this.setState({
-        status: '',
-        loading: false
-      });
-      return;
-    }
+  onSubmit = async (event) => {
     this.setState({
-      status: 'Starting upload',
+      status: 'Creating paste',
       loading: true
     });
-    const base64 = await toBase64(file);
-    const filename = uuidv4() + '.' + file.type.replace('image/', '');
-    fetch("https://publicactiontrigger.azurewebsites.net/api/dispatches/benkaiser/pages-imgur", {
+    const id = uuidv4();
+    const visibility = this.visibilityRef.current.value;
+    fetch("https://publicactiontrigger.azurewebsites.net/api/dispatches/benkaiser/pages-pastebin", {
       method: 'POST',
       mode: 'cors',
-      body: JSON.stringify({ event_type: 'Add Image', client_payload: { data: JSON.stringify({ filename, image: base64 }) } })
+      body: JSON.stringify({ event_type: 'Create Paste', client_payload: { data: JSON.stringify({
+        mode: escape(this.modeRef.current.value),
+        visibility: escape(visibility),
+        title: escape(this.titleRef.current.value),
+        contents: escape(this.editor),
+        id: escape(id)
+      })}})
     }).then((response) => {
       if (response.status === 200 || response.status === 204) {
         this.setState({
           status: 'Upload initiated. Will redirect when available (can take up to 1 minute)',
           loading: true
         });
-        this.waitForImage(filename);
+        this.waitForPaste(id, visibility);
       } else {
         this.setState({
-          status: 'Upload failed, image may be too big',
+          status: 'Upload failed, paste may be too big',
           loading: false
         });
       }
     }).catch(() => {
       this.setState({
-        status: 'Upload failed, image may be too big',
+        status: 'Upload failed, paste may be too big',
         loading: false
       });
     })
   }
 
-  waitForImage = (filename) => {
-    const location = 'images/' + filename;
+  waitForPaste = (id, visibility) => {
+    const location = visibility + '/' + id;
     setInterval(() => {
       fetch(location + '?cachebust=' + Math.random()).then((response) => {
         if (response.status === 200) {
