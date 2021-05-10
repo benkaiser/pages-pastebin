@@ -15,7 +15,8 @@
   {% include header.html rootpath="./" %}
   <div class="center-container">
     <h1>Public Pastes</h1>
-    {% for paste in site.public %}
+    {% assign sortedPastes = site.public | sort: 'date' | reverse %}
+    {% for paste in sortedPastes %}
         <h3><a href=".{{ paste.url }}">{{ paste.name | default: 'Unnamed Paste' }}</a></h3>
         {% assign lines = paste.content | remove: "<p>" | remove: "</p>" | newline_to_br | split: "<br />" %}
         {% assign linestruncated = lines | slice: 0,5 %}
