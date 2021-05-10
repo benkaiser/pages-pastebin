@@ -45,7 +45,7 @@ class App extends Component {
     return html`
       <div className='center-container'>
         <h1>Open Pastebin - Powered by GitHub Pages + GitHub Actions</h1>
-        <p>New Paste (Max size ${'<'}60kb)</p>
+        <p>New Paste (Max size 60kb)</p>
         ${ !this.state.status ?
           this.renderForm() :
           this.renderStatus()
