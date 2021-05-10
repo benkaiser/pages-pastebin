@@ -20,6 +20,7 @@ if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{1
 const output = `---
 name: ${TITLE.replace(/\n/g, ' ')}
 mode: ${MODE.replace(/\n/g, '')}
+date: ${new Date().toISOString()}
 ---
 ${CONTENTS}
 `;
