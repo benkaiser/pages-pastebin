@@ -24,8 +24,42 @@ jobs:
       run: echo "MODE=$(echo $GITHUB_CONTEXT | jq '.mode' -r)" >> $GITHUB_ENV
     - name: Writing Snippet to File
       run: node addsnippet.js
-    - name: Committing changes
-      uses: EndBug/add-and-commit@v7
+    - name: Committing changes with rebase
+      id: push
+      continue-on-error: true
+      uses: benkaiser/rebase-commit-push@v1.1
       with:
         author_name: Github Actions
         author_email: actions@github.com
+    - name: Retry Push 1
+      continue-on-error: true
+      id: retry1
+      if: steps.push.outcome=='failure'
+      uses: benkaiser/rebase-commit-push@v1.1
+      with:
+        author_name: Github Actions
+        author_email: actions@github.com
+    - name: Retry Push 2
+      continue-on-error: true
+      id: retry2
+      if: steps.retry1.outcome=='failure'
+      uses: benkaiser/rebase-commit-push@v1.1
+      with:
+        author_name: Github Actions
+        author_email: actions@github.com
+    - name: Retry Push 3
+      continue-on-error: true
+      id: retry3
+      if: steps.retry2.outcome=='failure'
+      uses: benkaiser/rebase-commit-push@v1.1
+      with:
+        author_name: Github Actions
+        author_email: actions@github.com
+    - name: set the status
+      if: always()
+      run: |
+        if ${{ steps.push.outcome=='success' || steps.retry1.outcome=='success' || steps.retry2.outcome=='success' || steps.retry3.outcome=='success' }}; then
+            echo fine
+        else
+            exit 1
+        fi
